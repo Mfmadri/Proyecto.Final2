@@ -20,3 +20,14 @@ Dataset `terremotos_profundidad`
 | Tipo       | Caracter | Causa del movimiento         |
 | Profundidad| Numérica | Profundidad del terremoto    |
 | ID         | Caracter | Identificador del movimiento |
+
+
+Dataset `terremotos_magnitud`
+
+| Variable         | Tipo     | Descripción                 |
+|------------------|----------|-----------------------------|
+| ID               | Caracter | Identificador del movimiento|
+| Magnitud         | Numérica | Magnitud del terremoto      |
+| Tipo de magnitud | Caracter | Unidad de medida de la magnitud |
+
+
