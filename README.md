@@ -28,3 +28,7 @@ Dataset `terremotos_magnitud`
 | ID               | Caracter | Identificador del movimiento|
 | Magnitud         | Numérica | Magnitud del terremoto      |
 | Tipo de magnitud | Caracter | Unidad de medida de la magnitud |
+
+
+
+
