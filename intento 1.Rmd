@@ -144,3 +144,53 @@ profundidad_limpio <- profundidad_limpio %>%
 
 
 ```
+
+
+• 2.6 Creación de columnas adicionales: para el conjunto de datos terremotos_profundidad cree 2 nuevas
+columnas: una que contenga el mes del terremoto, y otra que contenga el año del terremoto (4pts)
+
+```{r}
+profundidad_limpio <- profundidad_limpio %>%
+  mutate(Mes = month(Fecha),
+         Año = year(Fecha))
+
+```
+
+• 2.7 Unir ambos conjuntos de datos en un solo conjunto de datos llamado datos_terremotos. Para esto
+use un left_join o un right_join, la llave que une ambos datasets es la columna llamada ID en los
+conjuntos de datos originales. (2pts)
+
+```{r}
+datos_terremotos <- left_join(profundidad_limpio, select(datos_magnitud_limpio, -Nfila), by = "ID")
+
+```
+
+• 2.8 Eliminar columnas vacías e innecesarias: Elimine aquellas columnas vacías o que no están aportando
+ninguna información. (2pts)
+
+
+```{r}
+datos_terremotos <- datos_terremotos |> 
+  select(-Error_Profundidad)
+glimpse(datos_terremotos)
+
+```
+
+
+3. Análisis de Datos y Visualización: (39pts)
+En esta sección se utilizarán diversas técnicas de análisis de datos para explorar el conjunto de datos, usando
+paquetes como gt, ggplot2, plotly y leaflet. A continuación se describen los pasos necesarios:
+• 3.1 Hacer un pequeño análisis sobre variación para la variable magnitud. Puede usar ggplot2 o plolty,
+así como lo aprendido en el cuatrimestre pasado (8pts)
+
+```{r}
+ggplot(datos_terremotos, aes(x = Magnitud)) +
+  geom_histogram(binwidth = 0.1, fill = "#78281F", color = "black", alpha = 0.7) +
+  scale_x_continuous(breaks = seq(4.5, 9.5, by = 0.5)) + 
+  scale_y_continuous(breaks = seq(0,7000, by = 500)) +
+  labs(title = "Distribución de la Magnitud de los Terremotos",
+       x = "Magnitud", y = "Frecuencia") +
+  theme_minimal()
+
+```
+
