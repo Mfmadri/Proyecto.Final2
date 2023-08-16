@@ -1,0 +1,146 @@
+---
+title: "Para el proyecto"
+author: "MariaFernanda, Celia y Sandra"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(stringr)
+library(readr)
+library(readxl) 
+library(writexl) 
+library(utils)
+library(RSQLite) 
+library(DBI)
+library(lubridate)
+library(ggplot2)
+library(gt)
+library(leaflet)
+
+```
+
+Proyecto Final
+
+Programación en R para Análisis de Datos II
+
+Objetivo:
+
+El objetivo del proyecto final es generar un reporte analítico de manera colaborativa utilizando las herramien-
+tas aprendidas en los cursos de programación en R I y II. Asegúrense de que su reporte sea fácil de leer y
+
+entender, incluyendo explicaciones claras de sus hallazgos. Se debe hacer uso de R Markdown para crear el
+informe coherente que incluya tanto código como texto con explicaciones cuando corresponda.
+A continuación se escribe la guía para la realización del proyecto:
+1. Configuración de Git y Github: (15pts)
+El trabajo se llevará a cabo en grupos de máximo 3 personas.
+• 1.1 Una de las integrantes creará un repositorio de github y añadir a las otras 2 personas como
+colaboradoras. El nombre del repositorio deberá ser algo como proyecto_final_programacion_2. Cada
+una deberá clonar el repositorio de manera local y autentificarse con git. (2pts)
+• 1.2 Este repositorio en GitHub alojará el código relacionado con el proyecto. Se evaluará el uso de
+tiquetes para dividir las tareas, la realización de commits regulares con descripciones claras de lo que
+cada commit añade, así como el uso correcto de las solicitudes de fusión. (10pts)
+• 1.3 Prepare el README del proyecto. Adjunto encontrará una guía para la información básica que
+debe añadir en su README. (3pts)
+2. Preparación y limpieza de Datos: (22pts)
+En este proyecto trabajaremos con 2 conjuntos de datos sobre terremotos relacionados entre sí por medio de
+la columna ID. Los mismos deben leerse directamente con read_csv de las siguientes direcciones:
+• https://raw.githubusercontent.com/isa229/programacion_analisis_datos_ii/main/terremotos_
+profundidad.csv
+• https://raw.githubusercontent.com/isa229/programacion_analisis_datos_ii/main/terremotos_
+magnitud.csv
+El conjunto de datos muestra datos reportados para aquellos movimientos telúricos con una magNitud mayor
+a 5.5 desde 1965 hasta el 2016.
+Para cada uno de estos conjuntos de datos, use algunas de las técnicas aprendidas sobre preparación y
+limpieza de datos para:
+• 2.1 Realiza la lectura de los datos en R (2pts)
+
+```{r}
+datos_magnitud <- read_csv("https://raw.githubusercontent.com/isa229/programacion_analisis_datos_ii/main/terremotos_magnitud.csv")
+
+glimpse(datos_magnitud)
+
+datos_profundidad <- read_csv("https://raw.githubusercontent.com/isa229/programacion_analisis_datos_ii/main/terremotos_profundidad.csv")
+
+glimpse(datos_profundidad)
+
+```
+
+• 2.2 Limpiar nombre de las variables (traducir al español) (4pts)
+```{r}
+nombres_nuevos_magnitud <- c(
+  "Nfila",
+  "ID",                # Identificador
+  "Magnitud",          # Magnitud
+  "Tipo_Magnitud"      # Tipo de Magnitud
+)
+
+colnames(datos_magnitud) <- nombres_nuevos_magnitud
+
+nombres_nuevos_profundidad <- c(
+  "Nfila",
+  "Fecha",             # Fecha
+  "Hora",              # Hora
+  "Latitud",           # Latitud
+  "Longitud",          # Longitud
+  "Tipo",              # Tipo
+  "Profundidad",       # Profundidad
+  "Error_Profundidad",
+  "ID"                 # Identificador
+)
+
+colnames(datos_profundidad) <- nombres_nuevos_profundidad
+
+```
+
+• 2.3 Eliminación de filas duplicadas (si existen). (2pts)
+```{r}
+datos_magnitud_limpio <- datos_magnitud %>%
+  distinct(ID, .keep_all = TRUE)
+
+profundidad_limpio <- datos_profundidad %>%
+  distinct(ID, .keep_all = TRUE)
+```
+
+• 2.4 Transformación de los tipos de variables: para el conjunto de datos terremotos_profundidad use
+lubridate para transformar la fecha de carácter a un objetivo tipo fecha (2pts)
+```{r}
+filas_separar <- c(20651, 7565, 3540)
+for (fila in filas_separar) {
+
+  fecha_hora <- profundidad_limpio$Fecha[profundidad_limpio$Nfila == fila]
+  
+
+  Fecha <- substr(fecha_hora, 1, 10)
+  Hora <- substr(fecha_hora, 12, 23)
+  
+  profundidad_limpio$Fecha[profundidad_limpio$NFila == fila] <- Fecha
+  profundidad_limpio$Hora[profundidad_limpio$Nfila == fila] <- Hora
+  profundidad_limpio$Fecha[profundidad_limpio$Nfila == fila] <- as.Date(Fecha,format = "%m/%d/%Y")
+}
+
+
+profundidad_limpio$Fecha <- as.Date(profundidad_limpio$Fecha, format = "%m/%d/%Y")
+```
+1
+
+• 2.5 Transformación de datos: para el conjunto de datos terremotos_profundidad examine cuáles son los
+valores distintos que hay en la variable “Type” o tipo. Use mutate para unificar valores si es necesario
+(4pts)
+```{r}
+valores_distintos_tipo <- unique(profundidad_limpio$Tipo)
+
+print(valores_distintos_tipo)
+
+profundidad_limpio <- profundidad_limpio %>%
+  mutate(Tipo = case_when(
+    Tipo %in% c("nuclear explosion", "Nuclear Explosion") ~ "Nuclear Explosion",
+    Tipo %in% c("earthquake", "Earthquake") ~ "Earthquake",
+    TRUE ~ Tipo
+  ))
+
+
+
+```
+
