@@ -4,7 +4,7 @@ En este repositorio se encuentra el trabajo final del curso de Programación par
 
 ## Integrantes del Grupo
 - Maria Fernanda Madrigal
-- Celia Matarrita
+- Celia Matarrita.
 - Sandra Lopez
 
 ## Diccionario de Datos
