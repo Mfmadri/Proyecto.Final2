@@ -194,3 +194,84 @@ ggplot(datos_terremotos, aes(x = Magnitud)) +
 
 ```
 
+• 3.2 Haga un pequeño análisis sobre variación para la variable Tipo. Puede usar ggplot2 o plotly, así
+como lo aprendido en el cuatrimestre pasado. (8pts)
+```{r}
+ggplot(datos_terremotos, aes(x = Tipo, fill = Tipo)) +
+  geom_bar() +
+  labs(title = "Distribución de Tipos de Terremotos",
+       x = "Tipo", y = "Frecuencia") +
+  scale_y_continuous(breaks = seq(0, max(table(datos_terremotos$Tipo)), by = 1500)) +  
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5))
+```
+
+
+• 3.3 Filtre los datos de los terremotos para obtener solamente aquellos que se hayan dado entre las
+coordenadas de latitud 8 y 11 Norte con Longitud entre -85 y -82 Oeste. Estos son los movimiento
+telúricos que se dieron en Costa Rica. Cuántos fueron? (3pts)
+
+```{r}
+
+terremotos_costa_rica <- datos_terremotos %>%
+  filter(Latitud >= 8, Latitud <= 11, Longitud >= -85, Longitud <= -82)
+
+
+cantidad_terremotos_costa_rica <- nrow(terremotos_costa_rica)
+
+
+print(paste("La cantidad de terremotos en Costa Rica fue:", cantidad_terremotos_costa_rica))
+
+#"La cantidad de terremotos en Costa Rica fue: 65"
+```
+
+• 3.4 Filtre los datos de terremotos de Costa Rica para obtener los 10 terremotos con magnitud más
+altas en Costa Rica. Muestre estos datos en una tabla de gt que muestre el mes, año, latitud, longitud,
+magnitud y profundidad del terremoto. A esta tabla añada título, subtítulo, y al menos un pie de
+tabla (10pts)
+
+```{r}
+
+terremotos_costa_rica_tabla <- datos_terremotos |> 
+  filter(Latitud >= 8, Latitud <= 11, Longitud >= -85, Longitud <= -82) |> 
+  arrange(desc(Magnitud)) |> 
+  head(10)
+
+tabla_terremotos <- terremotos_costa_rica |> 
+  select(Mes, Año, Latitud, Longitud, Magnitud, Profundidad) |> 
+  gt() |> 
+  tab_header(
+    title = "Top 10 Terremotos de Magnitud Más Alta en Costa Rica",
+    subtitle = "Información de los terremotos con magnitud más alta en Costa Rica"
+  ) |> 
+  tab_footnote("Fuente: Datos de terremotos proporcionados por el USGS")
+
+print(tabla_terremotos)
+gtsave(tabla_terremotos, file = "tabla_terremotos.html")
+
+
+```
+
+• 3.5 Muestre los 10 terremotos con mayor magnitud obtenidos anteriormente en un mapa de leaflet.
+Como popup coloque el año del terremoto. (10pts)
+
+```{r}
+terremotos_costa_rica_mapa <- datos_terremotos |> 
+  filter(Latitud >= 8, Latitud <= 11, Longitud >= -85, Longitud <= -82) |> 
+  arrange(desc(Magnitud)) |> 
+  head(10) |> 
+  select(Latitud, Longitud, Magnitud, Año)
+
+mapa <- leaflet(terremotos_costa_rica) |> 
+  addTiles() |> 
+  addMarkers(
+    ~Longitud, ~Latitud,
+    popup = ~as.character(Año),
+    label = ~as.character(Magnitud),
+    labelOptions = labelOptions(noHide = TRUE, textOnly = TRUE)
+  )
+
+mapa
+```
+
+
